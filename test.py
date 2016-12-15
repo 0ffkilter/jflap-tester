@@ -95,7 +95,7 @@ def takingInput(filename):
             if state == "standard":
                 # The regex for test specifications is extremely
                 # permissive.
-                match = re.fullmatch(r'(empty|[0-1]*) ?((-> ?)?([a-z]+))?', line)
+                match = re.fullmatch(r'(empty|[0-1]*|[a-b]*|[1]*[-]*[1]*|[()]*) ?((-> ?)?([a-z]+))?', line)
                 if match:
                     # In the following code, word is the bitstring
                     # input; result is a boolean indicating whether
@@ -393,7 +393,7 @@ def tm_print_result_line(inpt, result, expected):
         input_w_tabs = inpt + "\t\t\t"
     else:
         input_w_tabs = inpt + "\t"
-
+    """
     global of
     if of is not None:  # if there is an output file
         print(input_w_tabs + str(result) + "\t" + \
@@ -409,6 +409,7 @@ def tm_print_result_line(inpt, result, expected):
             print("correct")
         else:
             print(" *** INCORRECT *** ")
+"""
 
 
 def tm_overall(filename1, filename2):
@@ -614,6 +615,7 @@ def print_result_line(inpt, result, expected):
     else:
         input_w_tabs = inpt + "\t"
 
+"""
     global of
     if of is not None:  # if there is an output file
         print(input_w_tabs + str(result) + "\t" + \
@@ -629,7 +631,7 @@ def print_result_line(inpt, result, expected):
             print("correct")
         else:
             print(" *** INCORRECT *** ")
-
+"""
 
 def overall(filename1, filename2):
     global INPUTS, TRANS, STATES, TYPES, TRANS2, TRANS3, BEENTO, count, \
@@ -674,7 +676,7 @@ def test(student_file, tests_file, f):
     tests vs. the tests_file, e.g., part1.sols
 
     f, an open file indicating where the output file goes...
-    """
+
     print("\n+-+-+-+-+-+-+-+-+\n\n", file=f)
     print("\n   File to be tested:\n", file=f)
     print("\n   " + str(student_file) + "\n", file=f)
@@ -691,7 +693,7 @@ def test(student_file, tests_file, f):
     print("\nTotal points for this problem :", total_points, file=f)
     print("\n\n\n", file=f)
     return total_points
-
+    """
 
 def tm_test(student_file, tests_file, f):
     """
@@ -699,7 +701,7 @@ def tm_test(student_file, tests_file, f):
     tests vs. the tests_file, e.g., part1.sols
 
     f, an open file indicating where the output file goes...
-    """
+
     print("\n+-+-+-+-+-+-+-+-+\n\n", file=f)
     print("\n   File to be tested:\n", file=f)
     print("\n   " + str(student_file) + "\n", file=f)
@@ -716,7 +718,7 @@ def tm_test(student_file, tests_file, f):
     print("\nTotal points for this problem :", total_points, file=f)
     print("\n\n\n", file=f)
     return total_points
-
+    """
 
 def testFileParser(filename):
     """
@@ -803,10 +805,13 @@ def runTests(jffFile, testFile, isTuringMachine):
         if 'initial' in value:
             initial_state = state
 
+    test_results = []
     if initial_state is None:
         print('Error: {} has no initial state.'
               .format('Turing machine' if isTuringMachine else 'NFA'))
-        exit(1)
+        for word, expected_result in INPUTS2.items():
+            test_results.append((word, False, expected_result))
+        return test_results
 
     for word, expected_result in INPUTS2.items():
         BEENTO = {}
@@ -821,12 +826,14 @@ def runTests(jffFile, testFile, isTuringMachine):
                   .format(word,
                           'accepted' if expected_result else 'rejected',
                           'accepted' if result else 'rejected'))
-            exit(1)
-
+            test_results.append((word, False, expected_result))
+        else:
+            test_results.append((word, True, expected_result))
     if INPUTS2:
         print('{} tests passed. Congratulations!'.format(len(INPUTS2)))
     else:
         print('No tests specified.')
+    return test_results
 
 usage = 'usage: test.py [--tm] <jff-filename>'
 
